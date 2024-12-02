@@ -1,5 +1,37 @@
 {
-    "base_url": "http://example.com/api",
-    "auth_token": "your-auth-token"
+  "host": "https://qa.digit.org/",
+  "localhost": "http://localhost:8082/",
+  "mockHost": "https://e5a23525-a2d2-42d3-b518-2761de88655c.mock.pstmn.io/",
+  "stateCode": "pb",
+  "cityCode": "amritsar",
+  "superUser": {
+    "userName": "EMPAUTO",
+    "password": "eGov@123",
+    "type": "EMPLOYEE"
+  },
+  "employee": {
+    "userName": "EMP-107-001333",
+    "password": "Password@2",
+    "type": "EMPLOYEE"
+  },
+  "citizen": {
+    "userName": 8073460929,
+    "password": 123456,
+    "type": "CITIZEN"
+  },
+  "alternateCitizen": {
+    "userName": 9999999999,
+    "password": 123456,
+    "type": "CITIZEN"
+  },
+  "counterEmployeeUser": {
+    "userName": "EMP-107-001333",
+    "password": "Password@2",
+    "type": "EMPLOYEE"
+  },
+  "citizenArchitect": {
+    "userName": 9222222222,
+    "password": 123456,
+    "type": "CITIZEN"
   }
-  
+}

@@ -1,14 +1,27 @@
 # Helper functions for API calls
 import logging
-
 import requests
 
-def make_request(method, url, headers=None, payload=None):
-    """Make an HTTP request."""
-    response = requests.request(method, url, headers=headers, json=payload)
-    response.raise_for_status()  # Raise exception for HTTP errors
-    return response.json()
+def make_request(method, url, headers=None, params=None, payload=None, is_json=True):
+    """
+    Make an HTTP request.
 
+    Args:
+        method (str): HTTP method (GET, POST, PUT, etc.).
+        url (str): The URL for the request.
+        headers (dict): Optional headers for the request.
+        params (dict): Optional query parameters for the request.
+        payload (dict, str, bytes, or file-like object): The request payload.
+        use_json (bool): If True, send payload as JSON; otherwise, send as form-encoded or raw data.
+
+    Returns:
+        requests.Response: The HTTP response object.
+    """
+    if is_json:
+        response = requests.request(method, url, headers=headers, params=params, json=payload)
+    else:
+        response = requests.request(method, url, headers=headers, params=params, data=payload)
+    return response
 
 def log_response(response):
     
