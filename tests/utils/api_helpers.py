@@ -1,6 +1,15 @@
 # Helper functions for API calls
 import logging
 
+import requests
+
+def make_request(method, url, headers=None, payload=None):
+    """Make an HTTP request."""
+    response = requests.request(method, url, headers=headers, json=payload)
+    response.raise_for_status()  # Raise exception for HTTP errors
+    return response.json()
+
+
 def log_response(response):
     
     """
@@ -30,3 +39,4 @@ def log_response(response):
     except Exception as e:
         # Log any exceptions while logging the response
         logging.error(f"Failed to log response: {e}")
+
