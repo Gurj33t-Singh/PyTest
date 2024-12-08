@@ -5,21 +5,22 @@ from urllib.parse import urljoin
 from tests.utils import api_helpers
 
 @pytest.fixture
-def get_auth_token(get_env_data):
+def get_auth_token(get_env_data, get_endpoints):
     """Fixture to provide authentication token."""
 
-    endpoint = "/user/oauth/token"
+    endpoint = get_endpoints["authToken"]["oauth"]
+
     url = urljoin(get_env_data["host"], endpoint)
 
-    headers = {
-        "authorization": "Basic ZWdvdi11c2VyLWNsaWVudDo="
-    }
+    body = {
+              "username": "SUPERUSER",
+              "password": "eGov@123",
+              "grant_type": "password",
+              "scope": "read",
+              "tenantId": "pg",
+              "userType": "EMPLOYEE"
+            }
 
-    api_helpers.make_request("POST", url, headers, 
-                             payload="", is_json=False)
-    return get_env_data["auth_token"]
+    response = api_helpers.make_request("POST", url, payload=body, is_json=False)
 
-@pytest.fixture
-def base_url(get_env_data):
-    """Fixture to provide the base URL."""
-    return get_env_data["base_url"]
+    return response.json()["access_token"]

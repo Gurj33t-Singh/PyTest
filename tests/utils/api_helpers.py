@@ -1,27 +1,78 @@
 # Helper functions for API calls
 import logging
 import requests
+from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
-def make_request(method, url, headers=None, params=None, payload=None, is_json=True):
+def make_request(method, url, headers=None, params=None, payload=None, is_json=True, timeout=10):
     """
-    Make an HTTP request.
+    Helper function to make API requests.
 
     Args:
-        method (str): HTTP method (GET, POST, PUT, etc.).
-        url (str): The URL for the request.
-        headers (dict): Optional headers for the request.
-        params (dict): Optional query parameters for the request.
-        payload (dict, str, bytes, or file-like object): The request payload.
-        use_json (bool): If True, send payload as JSON; otherwise, send as form-encoded or raw data.
+        method (str): HTTP method (GET, POST, PUT, DELETE).
+        url (str): The API endpoint.
+        payload (dict): Request body data.
+        headers (dict): Request headers.
+        params (dict): Query parameters.
+        is_json (bool): Whether to send the payload as JSON.
+        timeout (int): Request timeout in seconds.
 
     Returns:
-        requests.Response: The HTTP response object.
+        dict: Parsed JSON response or error details.
+
+    Raises:
+        Exception: If an error occurs during the request.
     """
-    if is_json:
-        response = requests.request(method, url, headers=headers, params=params, json=payload)
-    else:
-        response = requests.request(method, url, headers=headers, params=params, data=payload)
-    return response
+    if headers is None:
+        headers = {"Content-Type": "application/json"} if is_json else {}
+
+    try:
+        response = requests.request(
+            method=method,
+            url=url,
+            json=payload if is_json else None,
+            data=None if is_json else payload,
+            headers=headers,
+            params=params,
+            timeout=timeout,
+        )
+
+        # Attempt to parse JSON response
+        try:
+            return response.json()
+        except ValueError:
+            return {
+                "error": "Invalid JSON response",
+                "status_code": response.status_code,
+                "content": response.text,
+            }
+
+    except ConnectionError:
+        return {"error": "Connection error. Unable to reach the server.", "url": url}
+
+    except Timeout:
+        return {"error": f"Request timed out after {timeout} seconds.", "url": url}
+
+    except HTTPError as http_err:
+        return {
+            "error": "HTTP error occurred.",
+            "status_code": response.status_code if 'response' in locals() else None,
+            "details": str(http_err),
+            "url": url,
+        }
+
+    except RequestException as req_err:
+        return {
+            "error": "An error occurred during the request.",
+            "details": str(req_err),
+            "url": url,
+        }
+
+    except Exception as e:
+        return {
+            "error": "An unexpected error occurred.",
+            "details": str(e),
+            "url": url,
+        }
 
 def log_response(response):
     
