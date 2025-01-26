@@ -6,14 +6,14 @@ def get_env_data():
     """Load environment configuration data."""
     with open("tests/config/env_config.json") as f:
         env_config = json.load(f)
-    return env_config["Environment"]
+    return env_config
 
 @pytest.fixture(scope="session", autouse=True)
 def get_credentials():
     """Load environment configuration data."""
-    with open("tests/config/env_config.json") as f:
-        env_config = json.load(f)
-    return env_config["Credentials"]
+    with open("tests/config/credentials.json") as f:
+        creds = json.load(f)
+    return creds
 
 @pytest.fixture(scope="session", autouse=True)
 def get_endpoints():

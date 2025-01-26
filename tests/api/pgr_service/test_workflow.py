@@ -1,7 +1,7 @@
 # Workflow tests
 
 import pytest
-from tests.utils.api_helpers import make_request
+from tests.utils.api_utils import make_request
 from tests.utils.validations import validate_response_status
 
 # def test_business_workflow(base_url, get_auth_token):

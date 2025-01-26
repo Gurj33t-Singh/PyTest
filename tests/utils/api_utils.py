@@ -1,7 +1,26 @@
 # Helper functions for API calls
 import logging
-import requests
+import requests, json
+from urllib.parse import urljoin
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
+
+def get_env_data():
+    """Load environment configuration data."""
+    with open("tests/config/env_config.json") as f:
+        env_config = json.load(f)
+    return env_config
+
+def get_credentials():
+    """Load environment configuration data."""
+    with open("tests/config/credentials.json") as f:
+        creds = json.load(f)
+    return creds
+
+def get_endpoints():
+    """Load environment configuration data."""
+    with open("tests/config/endpoints.json") as f:
+        endpoints = json.load(f)
+    return endpoints
 
 def make_request(method, url, headers=None, params=None, payload=None, is_json=True, timeout=10):
     """
@@ -17,7 +36,7 @@ def make_request(method, url, headers=None, params=None, payload=None, is_json=T
         timeout (int): Request timeout in seconds.
 
     Returns:
-        dict: Parsed JSON response or error details.
+        dict: response obj or error details.
 
     Raises:
         Exception: If an error occurs during the request.
@@ -38,7 +57,7 @@ def make_request(method, url, headers=None, params=None, payload=None, is_json=T
 
         # Attempt to parse JSON response
         try:
-            return response.json()
+            return response
         except ValueError:
             return {
                 "error": "Invalid JSON response",
@@ -104,3 +123,24 @@ def log_response(response):
         # Log any exceptions while logging the response
         logging.error(f"Failed to log response: {e}")
 
+def get_auth_token(user):
+
+    url = urljoin(get_env_data()["host"], 
+                  get_endpoints()["authToken"]["oauth"])
+
+    cred = get_credentials()[user]
+
+    body = {
+              "username": cred["username"],
+              "password": cred["password"],
+              "grant_type": "password",
+              "scope": "read",
+              "tenantId": cred["tenantId"],
+              "userType": cred["type"]
+            }
+    
+    header = get_env_data()["auth_header"]
+
+    response = make_request("POST", url, payload=body, headers=header, is_json=False).json()
+
+    return response["access_token"], response["UserRequest"]
